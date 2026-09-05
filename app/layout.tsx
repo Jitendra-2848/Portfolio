@@ -1,22 +1,24 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
+import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const inter = Inter({
   subsets: ["latin"],
+  weight: ["400", "500"],
+  variable: "--font-sans",
+  display: "swap",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],
+  weight: ["400", "500"],
+  variable: "--font-mono",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "Portfolio | Jitendra Prajapat",
-  description: "Personal Portfolio & Projects showcase",
+  title: "Jitendra Prajapati — Full Stack & Backend Engineer",
+  description: "Backend-focused engineer specializing in high-concurrency systems, distributed databases, and real-time streaming.",
 };
 
 export default function RootLayout({
@@ -27,14 +29,10 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${inter.variable} ${jetbrainsMono.variable} scroll-smooth`}
     >
-      <body className="min-h-full flex flex-col bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 font-sans">
-        <Navbar />
-        <main className="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 py-10">
-          {children}
-        </main>
-        <Footer />
+      <body className="bg-[#08080a] text-[#EDEDED] font-sans antialiased selection:bg-[#BFFF3C] selection:text-[#08080a]">
+        {children}
       </body>
     </html>
   );

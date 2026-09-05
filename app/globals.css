@@ -1,26 +1,146 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Surfaces */
+  --void: #08080a;      /* page background */
+  --surface: #0e0e11;   /* cards, elevated elements */
+  --surface-hover: #15151a;
+  --border: rgba(255, 255, 255, 0.08); /* hairline dividers */
+  --border-hover: rgba(255, 255, 255, 0.18);
+
+  /* Typography */
+  --text: #FAFAFA;      /* primary content */
+  --muted: #8E8E98;     /* supporting text, labels */
+  --ghost: #52525B;     /* faint borders */
+
+  /* Accent */
+  --signal: #BFFF3C;    /* lime signal */
+  --brand-blue: #3b82f6;
+
+  /* Font references */
+  --font-sans-body: var(--font-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono-code: var(--font-mono), "JetBrains Mono", monospace;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+::selection {
+  background-color: var(--signal);
+  color: #08080a;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
+  background-color: var(--void);
+  color: var(--text);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--void);
+  color: var(--text);
+  font-family: var(--font-sans-body);
+  font-weight: 400;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  letter-spacing: -0.01em;
+  -webkit-font-smoothing: antialiased;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+/* Minimalist Quiet Heading */
+.font-title,
+.font-display-title,
+.font-serif-title {
+  font-family: var(--font-sans-body);
+  font-weight: 500;
+  letter-spacing: -0.025em;
+}
+
+/* Container System */
+.container {
+  max-width: 76rem;
+  margin-inline: auto;
+  padding-inline: clamp(1.25rem, 4vw, 2.5rem);
+}
+
+/* Bento Card */
+.bento-card {
+  background: rgba(18, 18, 22, 0.65);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border);
+  border-radius: 1.5rem;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.bento-card:hover {
+  border-color: var(--border-hover);
+  background: rgba(22, 22, 28, 0.8);
+}
+
+/* Signal Dot */
+.status {
+  position: relative;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--signal);
+  animation: breathe 3.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+@keyframes breathe {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.35; transform: scale(0.9); }
+}
+
+/* Pill Badge */
+.pill-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.85rem;
+  border-radius: 9999px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  background: rgba(25, 25, 30, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #ededed;
+  transition: all 0.2s ease;
+}
+
+.pill-badge:hover {
+  background: rgba(35, 35, 42, 0.9);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Custom Scrollbar for Project Slider */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Ambient subtle background glow */
+.ambient-glow {
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 1000px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.07) 0%, rgba(0, 0, 0, 0) 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
