@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef, useMemo } from "react";
+import { useEffect, useState, useRef, useMemo, useCallback } from "react";
 import { portfolioData, Project } from "@/lib/data";
 import ProjectPreviewMockup from "@/components/portfolio/ProjectPreviewMockup";
 import ProjectDetailsModal from "@/components/portfolio/ProjectDetailsModal";
@@ -284,10 +284,35 @@ export default function Home() {
     }
   };
 
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(true);
+
+  const checkProjectScroll = useCallback(() => {
+    if (projectsScrollRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = projectsScrollRef.current;
+      setCanScrollLeft(scrollLeft > 10);
+      setCanScrollRight(scrollLeft + clientWidth < scrollWidth - 10);
+    }
+  }, []);
+
+  useEffect(() => {
+    checkProjectScroll();
+    const el = projectsScrollRef.current;
+    if (el) {
+      el.addEventListener("scroll", checkProjectScroll, { passive: true });
+    }
+    window.addEventListener("resize", checkProjectScroll);
+    return () => {
+      if (el) el.removeEventListener("scroll", checkProjectScroll);
+      window.removeEventListener("resize", checkProjectScroll);
+    };
+  }, [checkProjectScroll]);
+
   const scrollProjects = (direction: "left" | "right") => {
     if (projectsScrollRef.current) {
       const scrollAmount = direction === "left" ? -380 : 380;
       projectsScrollRef.current.scrollBy({ left: scrollAmount, behavior: "smooth" });
+      setTimeout(checkProjectScroll, 350);
     }
   };
 
@@ -541,14 +566,24 @@ export default function Home() {
             <div className="flex items-center gap-2">
               <button
                 onClick={() => scrollProjects("left")}
-                className="w-9 h-9 rounded-full bg-white/5 hover:bg-white/15 border border-white/10 flex items-center justify-center text-sm text-[#A0A0A8] hover:text-white transition-all shadow"
+                disabled={!canScrollLeft}
+                className={`w-9 h-9 rounded-full border flex items-center justify-center text-sm transition-all shadow ${
+                  canScrollLeft
+                    ? "bg-white/10 hover:bg-white/20 border-white/20 text-white cursor-pointer active:scale-95"
+                    : "bg-white/5 border-white/5 text-[#55555e] cursor-not-allowed opacity-40"
+                }`}
                 aria-label="Scroll left"
               >
                 ←
               </button>
               <button
                 onClick={() => scrollProjects("right")}
-                className="w-9 h-9 rounded-full bg-white/5 hover:bg-white/15 border border-white/10 flex items-center justify-center text-sm text-[#A0A0A8] hover:text-white transition-all shadow"
+                disabled={!canScrollRight}
+                className={`w-9 h-9 rounded-full border flex items-center justify-center text-sm transition-all shadow ${
+                  canScrollRight
+                    ? "bg-white/10 hover:bg-white/20 border-white/20 text-white cursor-pointer active:scale-95"
+                    : "bg-white/5 border-white/5 text-[#55555e] cursor-not-allowed opacity-40"
+                }`}
                 aria-label="Scroll right"
               >
                 →
@@ -556,11 +591,35 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Slider Container with compact cards and smooth snap scroll */}
-          <div
-            ref={projectsScrollRef}
-            className="flex gap-6 overflow-x-auto pb-6 pt-2 hide-scrollbar snap-x snap-mandatory"
-          >
+          {/* Slider Container with side floating arrows and smooth snap scroll */}
+          <div className="relative group/slider">
+            {/* Left Floating Arrow overlay button */}
+            {canScrollLeft && (
+              <button
+                onClick={() => scrollProjects("left")}
+                className="absolute left-2 top-1/2 -translate-y-1/2 z-30 w-10 h-10 rounded-full bg-black/80 hover:bg-black border border-white/20 text-white shadow-xl backdrop-blur-md flex items-center justify-center transition-all opacity-90 hover:scale-110 active:scale-95"
+                aria-label="Scroll left"
+              >
+                ←
+              </button>
+            )}
+
+            {/* Right Floating Arrow overlay button */}
+            {canScrollRight && (
+              <button
+                onClick={() => scrollProjects("right")}
+                className="absolute right-2 top-1/2 -translate-y-1/2 z-30 w-10 h-10 rounded-full bg-black/80 hover:bg-black border border-white/20 text-white shadow-xl backdrop-blur-md flex items-center justify-center transition-all opacity-90 hover:scale-110 active:scale-95"
+                aria-label="Scroll right"
+              >
+                →
+              </button>
+            )}
+
+            <div
+              ref={projectsScrollRef}
+              onScroll={checkProjectScroll}
+              className="flex gap-6 overflow-x-auto pb-6 pt-2 hide-scrollbar snap-x snap-mandatory touch-pan-x"
+            >
             {portfolioData.projects.map((project) => (
               <div
                 key={project.id}
@@ -646,6 +705,7 @@ export default function Home() {
                 </div>
               </div>
             ))}
+            </div>
           </div>
         </section>
 
