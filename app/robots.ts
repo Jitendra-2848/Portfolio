@@ -1,7 +1,11 @@
 import { MetadataRoute } from "next";
 
 export default function robots(): MetadataRoute.Robots {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://jitendra-prajapati.vercel.app";
+  const siteUrl =
+    process.env.NEXT_PUBLIC_SITE_URL || "https://workwithjitendra.vercel.app";
+
+  const baseUrl = siteUrl.startsWith("http") ? siteUrl : `https://${siteUrl}`;
+  const cleanBaseUrl = baseUrl.replace(/\/$/, "");
 
   return {
     rules: [
@@ -10,6 +14,6 @@ export default function robots(): MetadataRoute.Robots {
         allow: "/",
       },
     ],
-    sitemap: `${baseUrl}/sitemap.xml`,
+    sitemap: `${cleanBaseUrl}/sitemap.xml`,
   };
 }
