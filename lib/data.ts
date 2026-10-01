@@ -210,5 +210,20 @@ export const portfolioData = {
       previewType: "webrtc",
       image: "/SFU_Demo.png",
     },
+    {
+      id: "crafters-haven",
+      title: "CRAFTER'S HAVEN",
+      category: "Full-Stack Artisan Marketplace",
+      description: "A full-stack e-commerce marketplace platform for artisans and creators to showcase, manage, and sell handcrafted products with custom storefronts.",
+      problem: "Independent creators struggled with complex store setups, poor inventory visibility, and high platform commissions on existing craft portals.",
+      solution: "Engineered a streamlined marketplace with role-based access control, responsive product catalog, dynamic filtering, cart checkout, and optimized database models.",
+      result: "Enabled independent creators to build dedicated storefronts with instant product publishing and seamless checkout.",
+      tags: ["TypeScript", "Next.js", "Node.js", "MongoDB", "Tailwind CSS", "Express.js"],
+      githubUrl: "https://github.com/Jitendra-2848/Crafters-Haven",
+      featured: true,
+      statusBadge: "LATEST PROJECT",
+      previewType: "marketplace",
+    },
   ] as Project[],
 };
+
