@@ -310,17 +310,55 @@ export default function Home() {
 
   const scrollProjects = (direction: "left" | "right") => {
     if (projectsScrollRef.current) {
-      const scrollAmount = direction === "left" ? -380 : 380;
-      projectsScrollRef.current.scrollBy({ left: scrollAmount, behavior: "smooth" });
-      setTimeout(checkProjectScroll, 350);
+      const cardWidth = 384;
+      const currentScroll = projectsScrollRef.current.scrollLeft;
+      const targetScroll =
+        direction === "left"
+          ? currentScroll - cardWidth
+          : currentScroll + cardWidth;
+
+      projectsScrollRef.current.scrollTo({
+        left: targetScroll,
+        behavior: "smooth",
+      });
+      setTimeout(checkProjectScroll, 400);
     }
   };
 
-  const handleProjectCardClick = (project: Project) => {
-    const targetUrl = project.demoUrl || project.githubUrl;
-    if (targetUrl) {
-      window.open(targetUrl, "_blank", "noopener,noreferrer");
+  const isMouseDownRef = useRef(false);
+  const startXRef = useRef(0);
+  const scrollLeftRef = useRef(0);
+  const hasMovedRef = useRef(false);
+  const [isDraggingProjects, setIsDraggingProjects] = useState(false);
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (!projectsScrollRef.current) return;
+    isMouseDownRef.current = true;
+    hasMovedRef.current = false;
+    startXRef.current = e.pageX - projectsScrollRef.current.offsetLeft;
+    scrollLeftRef.current = projectsScrollRef.current.scrollLeft;
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isMouseDownRef.current || !projectsScrollRef.current) return;
+    const x = e.pageX - projectsScrollRef.current.offsetLeft;
+    const walk = (x - startXRef.current) * 1.5;
+    if (Math.abs(walk) > 5) {
+      hasMovedRef.current = true;
+      setIsDraggingProjects(true);
     }
+    projectsScrollRef.current.scrollLeft = scrollLeftRef.current - walk;
+    checkProjectScroll();
+  };
+
+  const handleMouseUpOrLeave = () => {
+    isMouseDownRef.current = false;
+    setTimeout(() => setIsDraggingProjects(false), 50);
+  };
+
+  const handleProjectCardClick = (project: Project) => {
+    if (hasMovedRef.current) return;
+    setSelectedProject(project);
   };
 
   return (
@@ -550,7 +588,7 @@ export default function Home() {
         </section>
 
         {/* PROJECTS SECTION — Slider with Left/Right Buttons */}
-        <section id="projects" className="space-y-6">
+        <section id="projects" className="space-y-6 overflow-hidden relative">
           {/* Section Header */}
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
             <div>
@@ -570,7 +608,7 @@ export default function Home() {
                 className={`w-9 h-9 rounded-full border flex items-center justify-center text-sm transition-all shadow ${
                   canScrollLeft
                     ? "bg-white/10 hover:bg-white/20 border-white/20 text-white cursor-pointer active:scale-95"
-                    : "bg-white/5 border-white/5 text-[#55555e] cursor-not-allowed opacity-40"
+                    : "bg-white/5 border-white/5 text-[#55555e] cursor-not-allowed opacity-30"
                 }`}
                 aria-label="Scroll left"
               >
@@ -582,7 +620,7 @@ export default function Home() {
                 className={`w-9 h-9 rounded-full border flex items-center justify-center text-sm transition-all shadow ${
                   canScrollRight
                     ? "bg-white/10 hover:bg-white/20 border-white/20 text-white cursor-pointer active:scale-95"
-                    : "bg-white/5 border-white/5 text-[#55555e] cursor-not-allowed opacity-40"
+                    : "bg-white/5 border-white/5 text-[#55555e] cursor-not-allowed opacity-30"
                 }`}
                 aria-label="Scroll right"
               >
@@ -591,34 +629,18 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Slider Container with side floating arrows and smooth snap scroll */}
-          <div className="relative group/slider">
-            {/* Left Floating Arrow overlay button */}
-            {canScrollLeft && (
-              <button
-                onClick={() => scrollProjects("left")}
-                className="absolute left-2 top-1/2 -translate-y-1/2 z-30 w-10 h-10 rounded-full bg-black/80 hover:bg-black border border-white/20 text-white shadow-xl backdrop-blur-md flex items-center justify-center transition-all opacity-90 hover:scale-110 active:scale-95"
-                aria-label="Scroll left"
-              >
-                ←
-              </button>
-            )}
-
-            {/* Right Floating Arrow overlay button */}
-            {canScrollRight && (
-              <button
-                onClick={() => scrollProjects("right")}
-                className="absolute right-2 top-1/2 -translate-y-1/2 z-30 w-10 h-10 rounded-full bg-black/80 hover:bg-black border border-white/20 text-white shadow-xl backdrop-blur-md flex items-center justify-center transition-all opacity-90 hover:scale-110 active:scale-95"
-                aria-label="Scroll right"
-              >
-                →
-              </button>
-            )}
-
+          {/* Slider Container with smooth horizontal scroll */}
+          <div className="relative overflow-hidden rounded-2xl">
             <div
               ref={projectsScrollRef}
               onScroll={checkProjectScroll}
-              className="flex gap-6 overflow-x-auto pb-6 pt-2 hide-scrollbar snap-x snap-mandatory touch-pan-x"
+              onMouseDown={handleMouseDown}
+              onMouseMove={handleMouseMove}
+              onMouseUp={handleMouseUpOrLeave}
+              onMouseLeave={handleMouseUpOrLeave}
+              className={`flex gap-6 overflow-x-auto pb-4 pt-2 hide-scrollbar scroll-smooth touch-pan-x select-none ${
+                isDraggingProjects ? "cursor-grabbing" : "cursor-grab"
+              }`}
             >
             {portfolioData.projects.map((project) => (
               <div

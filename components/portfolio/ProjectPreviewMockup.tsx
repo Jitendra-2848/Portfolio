@@ -36,11 +36,11 @@ export default function ProjectPreviewMockup({ type, image, title, demoUrl, gith
       </div>
 
       {/* "PERSONAL PROJECT" badge overlay like Amber Bisht */}
-      <div className="absolute top-8 left-3 z-20">
+      {/* <div className="absolute top-8 left-3 z-20">
         <span className="text-[9px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-black/85 text-white border border-white/15 backdrop-blur-md">
           Personal Project
         </span>
-      </div>
+      </div> */}
 
       {/* If custom image provided, render image */}
       {image ? (
